@@ -10,12 +10,13 @@ namespace ChessBoardModel
         // default should be 8
         public int Size { get; set; }
         public Cell[,] TheGrid { get; set; }
+        public Game game { get; set; }
 
-        private Game game = new Game();
         private string[] pieces = {"Rook","Knight","Bishop","Queen","King","Bishop","Knight","Rook"};
 
         public Board(int size)
         {
+            game = new Game();
             this.Size = size;
 
             TheGrid = new Cell[Size, Size];
@@ -99,39 +100,48 @@ namespace ChessBoardModel
                     if (curretCell.IsLegalNextMove)
                     {
                         TheGrid[curretCell.RowNumber, curretCell.ColumnNumber].CurrentPiece = selectedCell.CurrentPiece;
+                        TheGrid[curretCell.RowNumber, curretCell.ColumnNumber].IsCurrentlyOccupied = true;
                         TheGrid[game.SelectedCell.RowNumber, game.SelectedCell.ColumnNumber].CurrentPiece = null;
+                        TheGrid[game.SelectedCell.RowNumber, game.SelectedCell.ColumnNumber].IsCurrentlyOccupied = false;
                         game.SelectedCell = null;
                         game.IsPieceSelected = false;
+                        MakeAllCellsIllegal();
                     }
                 }
                 else
                 {
-                    switch (chessPiece)
+                    if (curretCell.CurrentPiece != null)
                     {
-                        case "Knight":
-                            MarkNextLegalKnightMoves(curretCell);
-                            break;
-                        case "King":
-                            MarkNextLegalKingMoves(curretCell);
-                            break;
-                        case "Rook":
-                            MarkNextLegalRookMoves(curretCell);
-                            break;
-                        case "Bishop":
-                            MarkNextLegalBishopMoves(curretCell);
-                            break;
-                        case "Queen":
-                            MarkNextLegalQueenMoves(curretCell);
-                            break;
-                        default:
-                            break;
-                    }
+                        if (curretCell.CurrentPiece.IsPlayerControlled)
+                        {
+                            switch(chessPiece)
+                            {
+                                case "Knight":
+                                MarkNextLegalKnightMoves(curretCell);
+                                break;
+                                case "King":
+                                MarkNextLegalKingMoves(curretCell);
+                                break;
+                                case "Rook":
+                                MarkNextLegalRookMoves(curretCell);
+                                break;
+                                case "Bishop":
+                                MarkNextLegalBishopMoves(curretCell);
+                                break;
+                                case "Queen":
+                                MarkNextLegalQueenMoves(curretCell);
+                                break;
+                                default:
+                                break;
+                            }
 
-                    if (chessPiece != null)
-                    {
-                        TheGrid[curretCell.RowNumber, curretCell.ColumnNumber].IsCurrentlyOccupied = true;
-                        game.IsPieceSelected = true;
-                        game.SelectedCell = curretCell;
+                            if (chessPiece != null)
+                            {
+                                TheGrid[curretCell.RowNumber, curretCell.ColumnNumber].IsCurrentlyOccupied = true;
+                                game.IsPieceSelected = true;
+                                game.SelectedCell = curretCell;
+                            }
+                        }
                     }
                 }
             }
@@ -139,7 +149,16 @@ namespace ChessBoardModel
 
         }
 
-
+        public void MakeAllCellsIllegal()
+        {
+            for (int i = 0; i < Size; i++)
+            {
+                for (int j = 0; j < Size; j++)
+                {
+                    TheGrid[i, j].IsLegalNextMove = false;
+                }
+            }
+        }
         public void MarkNextLegalKnightMoves(Cell currentCell)
         {
             // Try to move down right

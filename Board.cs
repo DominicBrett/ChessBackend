@@ -60,7 +60,7 @@ namespace ChessBoardModel
         }
         public void PopulateCellsWithFriendlyPieces()
         {
-            //PopulateFriendlyPawns();
+            PopulateFriendlyPawns();
             PopulateOtherFriendlyPieces();
         }
 
@@ -131,6 +131,9 @@ namespace ChessBoardModel
                                 case "Queen":
                                 MarkNextLegalQueenMoves(curretCell);
                                 break;
+                                case "Pawn":
+                                MarkPawnLegalMoves(curretCell);
+                                break;
                                 default:
                                 break;
                             }
@@ -158,6 +161,35 @@ namespace ChessBoardModel
                     TheGrid[i, j].IsLegalNextMove = false;
                 }
             }
+        }
+
+        public void MarkPawnLegalMoves(Cell currentCell)
+        {
+            if (currentCell.CurrentPiece.IsPlayerControlled)
+            {
+                MarkFriendlyLegalMoves(currentCell);
+            }
+            else
+            {
+                MarkEnemyLegalMoves(currentCell);
+            }
+        }
+        public void MarkFriendlyLegalMoves(Cell currentCell)
+        {
+            if (currentCell.ColumnNumber == Size - 2)
+            {
+                //This is the moment I realised I got the rows and columns wrong the whole time 🙃
+                TryMove(currentCell, 0, -1);
+                TryMove(currentCell, 0, -2);
+            }
+            else
+            {
+                TryMove(currentCell, 0, -1);
+            }
+        }
+        public void MarkEnemyLegalMoves(Cell currentCell)
+        {
+
         }
         public void MarkNextLegalKnightMoves(Cell currentCell)
         {

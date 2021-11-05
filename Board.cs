@@ -10,13 +10,11 @@ namespace ChessBoardModel
         // default should be 8
         public int Size { get; set; }
         public Cell[,] TheGrid { get; set; }
-        public Game game { get; set; }
 
         private string[] pieces = {"Rook","Knight","Bishop","Queen","King","Bishop","Knight","Rook"};
 
         public Board(int size)
         {
-            game = new Game();
             this.Size = size;
 
             TheGrid = new Cell[Size, Size];
@@ -88,73 +86,51 @@ namespace ChessBoardModel
             currentCell.CurrentPiece = piece;
         }
 
-        public void MarkNextLegalMoves(Cell curretCell, string chessPiece)
+        public void MarkNextLegalMoves(Cell currentCell, string chessPiece)
         {
-            //Clear Board
-            //ClearBoard();
-            if (game.IsPlayerTurn)
+            switch (chessPiece)
             {
-                if(game.IsPieceSelected && IsThereAValidMove())
-                {
-                    Cell selectedCell = game.SelectedCell;
-                    if (curretCell.IsLegalNextMove)
-                    {
-                        TheGrid[curretCell.RowNumber, curretCell.ColumnNumber].CurrentPiece = selectedCell.CurrentPiece;
-                        TheGrid[curretCell.RowNumber, curretCell.ColumnNumber].IsCurrentlyOccupied = true;
-                        TheGrid[game.SelectedCell.RowNumber, game.SelectedCell.ColumnNumber].CurrentPiece = null;
-                        TheGrid[game.SelectedCell.RowNumber, game.SelectedCell.ColumnNumber].IsCurrentlyOccupied = false;
-                        game.SelectedCell = null;
-                        game.IsPieceSelected = false;
-                        UpdatePawns();
-                        MakeAllCellsIllegal();
-                    } 
-                    else if (IsCellFriendlyOccupied(curretCell))
-                    {
-                        game.IsPieceSelected = false;
-                        MakeAllCellsIllegal();
-                    }
-                }
-                else
-                {
-                    if (curretCell.CurrentPiece != null)
-                    {
-                        if (curretCell.CurrentPiece.IsPlayerControlled)
-                        {
-                            switch(chessPiece)
-                            {
-                                case "Knight":
-                                MarkNextLegalKnightMoves(curretCell);
-                                break;
-                                case "King":
-                                MarkNextLegalKingMoves(curretCell);
-                                break;
-                                case "Rook":
-                                MarkNextLegalRookMoves(curretCell);
-                                break;
-                                case "Bishop":
-                                MarkNextLegalBishopMoves(curretCell);
-                                break;
-                                case "Queen":
-                                MarkNextLegalQueenMoves(curretCell);
-                                break;
-                                case "Pawn":
-                                MarkPawnLegalMoves(curretCell);
-                                break;
-                                default:
-                                break;
-                            }
-
-                            if (chessPiece != null)
-                            {
-                                TheGrid[curretCell.RowNumber, curretCell.ColumnNumber].IsCurrentlyOccupied = true;
-                                game.IsPieceSelected = true;
-                                game.SelectedCell = curretCell;
-                            }
-                        }
-                    }
-                }
+                case "Knight":
+                    MarkNextLegalKnightMoves(currentCell);
+                    break;
+                case "King":
+                    MarkNextLegalKingMoves(currentCell);
+                    break;
+                case "Rook":
+                    MarkNextLegalRookMoves(currentCell);
+                    break;
+                case "Bishop":
+                    MarkNextLegalBishopMoves(currentCell);
+                    break;
+                case "Queen":
+                    MarkNextLegalQueenMoves(currentCell);
+                    break;
+                case "Pawn":
+                    MarkPawnLegalMoves(currentCell);
+                    break;
+                default:
+                    break;
             }
-            // find all legal moves and mark them
+            TheGrid[currentCell.RowNumber, currentCell.ColumnNumber].IsCurrentlyOccupied = true;
+        }
+
+        public void MakeMove(Cell currentCell, Cell selectedCell, string chessPiece)
+        {
+            TheGrid[currentCell.RowNumber, currentCell.ColumnNumber].CurrentPiece = selectedCell.CurrentPiece;
+            TheGrid[currentCell.RowNumber, currentCell.ColumnNumber].IsCurrentlyOccupied = true;
+            TheGrid[selectedCell.RowNumber, selectedCell.ColumnNumber].CurrentPiece = null;
+            TheGrid[selectedCell.RowNumber, selectedCell.ColumnNumber].IsCurrentlyOccupied = false;
+           
+            UpdatePawns();
+            MakeAllCellsIllegal();
+        }
+        public void MarkNextLegalEnemyyMoves(Cell currentCell, string chessPiece)
+        {
+
+        }
+
+        public void MakeNextLegalFriendlyMove(Cell currentCell, string chessPiece)
+        {
 
         }
 

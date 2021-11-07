@@ -86,27 +86,27 @@ namespace ChessBoardModel
             currentCell.CurrentPiece = piece;
         }
 
-        public void MarkNextLegalMoves(Cell currentCell, string chessPiece)
+        public void MarkNextLegalMoves(Cell currentCell, string chessPiece, bool isPlayerTurn)
         {
             switch (chessPiece)
             {
                 case "Knight":
-                    MarkNextLegalKnightMoves(currentCell);
+                    MarkNextLegalKnightMoves(currentCell, isPlayerTurn);
                     break;
                 case "King":
-                    MarkNextLegalKingMoves(currentCell);
+                    MarkNextLegalKingMoves(currentCell, isPlayerTurn);
                     break;
                 case "Rook":
-                    MarkNextLegalRookMoves(currentCell);
+                    MarkNextLegalRookMoves(currentCell, isPlayerTurn);
                     break;
                 case "Bishop":
-                    MarkNextLegalBishopMoves(currentCell);
+                    MarkNextLegalBishopMoves(currentCell, isPlayerTurn);
                     break;
                 case "Queen":
-                    MarkNextLegalQueenMoves(currentCell);
+                    MarkNextLegalQueenMoves(currentCell, isPlayerTurn);
                     break;
                 case "Pawn":
-                    MarkPawnLegalMoves(currentCell);
+                    MarkPawnLegalMoves(currentCell, isPlayerTurn);
                     break;
                 default:
                     break;
@@ -187,22 +187,19 @@ namespace ChessBoardModel
             }
         }
 
-        public void MarkPawnLegalMoves(Cell currentCell)
+        public void MarkPawnLegalMoves(Cell currentCell, bool isPlayerControlled)
         {
-            if (currentCell.CurrentPiece.IsPlayerControlled)
+            if (isPlayerControlled)
             {
-                MarkFriendlyLegalMoves(currentCell);
+                MarkFriendlyLegalMoves(currentCell, isPlayerControlled);
             }
             else
             {
-                MarkEnemyLegalMoves(currentCell);
+                MarkEnemyLegalMoves(currentCell, isPlayerControlled);
             }
-
-            TryTakePawn(currentCell, -1, -1);
-            TryTakePawn(currentCell, 1, -1);
         }
 
-        public void MarkFriendlyLegalMoves(Cell currentCell)
+        public void MarkFriendlyLegalMoves(Cell currentCell, bool isPlayerControlled)
         {
             if (currentCell.ColumnNumber == Size - 2)
             {
@@ -214,79 +211,92 @@ namespace ChessBoardModel
             {
                 TryMove(currentCell, 0, -1);
             }
+            TryTakePawn(currentCell, -1, -1, isPlayerControlled);
+            TryTakePawn(currentCell, 1, -1, isPlayerControlled);
         }
-        public void MarkEnemyLegalMoves(Cell currentCell)
+        public void MarkEnemyLegalMoves(Cell currentCell, bool isPlayerControlled)
         {
-            
+            if (currentCell.ColumnNumber == 1)
+            {
+                //This is the moment I realised I got the rows and columns wrong the whole time 🙃
+                TryMove(currentCell, 0, 1);
+                TryMove(currentCell, 0, 2);
+            }
+            else
+            {
+                TryMove(currentCell, 0, 1);
+            }
+            TryTakePawn(currentCell, 1, 1, isPlayerControlled);
+            TryTakePawn(currentCell, -1, 1, isPlayerControlled);
         }
-        public void MarkNextLegalKnightMoves(Cell currentCell)
+        public void MarkNextLegalKnightMoves(Cell currentCell, bool isPlayerControlled)
         {
             // Try to move down right
-            TryMove(currentCell,2,1);
-            TryMove(currentCell, 1, 2);
+            TryMove(currentCell,2,1, isPlayerControlled);
+            TryMove(currentCell, 1, 2, isPlayerControlled);
             // Try to move down left
-            TryMove(currentCell, 2, -1);
-            TryMove(currentCell, 1, -2);
+            TryMove(currentCell, 2, -1, isPlayerControlled);
+            TryMove(currentCell, 1, -2, isPlayerControlled);
             // Try to move up right
-            TryMove(currentCell, -2, 1);
-            TryMove(currentCell, -1, 2);
+            TryMove(currentCell, -2, 1, isPlayerControlled);
+            TryMove(currentCell, -1, 2, isPlayerControlled);
             // Try to move up left
-            TryMove(currentCell, -2, -1);
-            TryMove(currentCell, -1, -2);
+            TryMove(currentCell, -2, -1, isPlayerControlled);
+            TryMove(currentCell, -1, -2, isPlayerControlled);
         }
 
-        public void MarkNextLegalKingMoves(Cell currentCell)
+        public void MarkNextLegalKingMoves(Cell currentCell,bool isPlayerControlled)
         {
-            TryMove(currentCell, 1, 0);
-            TryMove(currentCell, 1, 1);
-            TryMove(currentCell, 0, 1);
-            TryMove(currentCell, -1, 1);
-            TryMove(currentCell, 1, -1);
-            TryMove(currentCell, -1, 0);
-            TryMove(currentCell, -1, -1);
-            TryMove(currentCell, 0, -1);
+            TryMove(currentCell, 1, 0, isPlayerControlled);
+            TryMove(currentCell, 1, 1, isPlayerControlled);
+            TryMove(currentCell, 0, 1, isPlayerControlled);
+            TryMove(currentCell, -1, 1, isPlayerControlled);
+            TryMove(currentCell, 1, -1, isPlayerControlled);
+            TryMove(currentCell, -1, 0, isPlayerControlled);
+            TryMove(currentCell, -1, -1, isPlayerControlled);
+            TryMove(currentCell, 0, -1, isPlayerControlled);
         }
 
-        public void MarkNextLegalRookMoves(Cell currentCell)
+        public void MarkNextLegalRookMoves(Cell currentCell, bool isPlayerTurn)
         {
-            MoveOrthogonallyEndless(currentCell);
+            MoveOrthogonallyEndless(currentCell, isPlayerTurn);
         }
 
-        public void MarkNextLegalBishopMoves(Cell currentCell)
+        public void MarkNextLegalBishopMoves(Cell currentCell, bool isPlayerTurn)
         {
-            MoveDiagonallyEndless(currentCell);
+            MoveDiagonallyEndless(currentCell,isPlayerTurn);
         }
 
-        public void MarkNextLegalQueenMoves(Cell currentCell)
+        public void MarkNextLegalQueenMoves(Cell currentCell,bool isPlayerTurn)
         {
-            MoveOrthogonallyEndless(currentCell);
-            MoveDiagonallyEndless(currentCell);
+            MoveOrthogonallyEndless(currentCell, isPlayerTurn);
+            MoveDiagonallyEndless(currentCell, isPlayerTurn);
 
         }
 
-        public void MoveOrthogonallyEndless(Cell currentCell)
+        public void MoveOrthogonallyEndless(Cell currentCell,bool isPlayerTurn)
         {
-            MoveInDirectionTillEndOfBoard(currentCell, -1, 0);
-            MoveInDirectionTillEndOfBoard(currentCell, 1, 0);
-            MoveInDirectionTillEndOfBoard(currentCell, 0, -1);
-            MoveInDirectionTillEndOfBoard(currentCell, 0, 1);
+            MoveInDirectionTillEndOfBoard(currentCell, -1, 0, isPlayerTurn);
+            MoveInDirectionTillEndOfBoard(currentCell, 1, 0, isPlayerTurn);
+            MoveInDirectionTillEndOfBoard(currentCell, 0, -1, isPlayerTurn);
+            MoveInDirectionTillEndOfBoard(currentCell, 0, 1, isPlayerTurn);
         }
-        public void MoveDiagonallyEndless(Cell currentCell)
+        public void MoveDiagonallyEndless(Cell currentCell,bool isPlayerTurn)
         {
-            MoveInDirectionTillEndOfBoard(currentCell, -1, -1);
-            MoveInDirectionTillEndOfBoard(currentCell, 1, 1);
-            MoveInDirectionTillEndOfBoard(currentCell, 1, -1);
-            MoveInDirectionTillEndOfBoard(currentCell, -1, 1);
+            MoveInDirectionTillEndOfBoard(currentCell, -1, -1, isPlayerTurn);
+            MoveInDirectionTillEndOfBoard(currentCell, 1, 1, isPlayerTurn);
+            MoveInDirectionTillEndOfBoard(currentCell, 1, -1, isPlayerTurn);
+            MoveInDirectionTillEndOfBoard(currentCell, -1, 1, isPlayerTurn);
         }
 
-        public void MoveInDirectionTillEndOfBoard(Cell currentCell, int moveRow, int moveColumn)
+        public void MoveInDirectionTillEndOfBoard(Cell currentCell, int moveRow, int moveColumn, bool isPlayerTurn)
         {
             bool KeepMoving = true;
             bool IsMovingRow = moveRow != 0;
             bool IsMovingColumn = moveColumn != 0;
             while (KeepMoving)
             {
-                KeepMoving = TryMoveAndReturnStatus(currentCell, moveRow, moveColumn);
+                KeepMoving = TryMoveAndReturnStatus(currentCell, moveRow, moveColumn, isPlayerTurn);
                 if (IsMovingRow && moveRow > 0)
                 {
                     moveRow += 1;
@@ -305,7 +315,7 @@ namespace ChessBoardModel
                 }
             }
         }
-        public bool TryMoveAndReturnStatus(Cell currentCell, int moveRow, int moveColumn)
+        public bool TryMoveAndReturnStatus(Cell currentCell, int moveRow, int moveColumn, bool isPlayerTurn)
         {
             if (IsCellValid(currentCell, moveRow, moveColumn))
             {
@@ -314,7 +324,7 @@ namespace ChessBoardModel
             }
             else
             {
-                if (IsCellTakeable(currentCell, moveRow, moveColumn))
+                if (IsCellTakeable(currentCell, moveRow, moveColumn, isPlayerTurn))
                 {
                     TheGrid[currentCell.RowNumber + moveRow, currentCell.ColumnNumber + moveColumn].IsLegalNextMove = true;
                 }
@@ -322,7 +332,7 @@ namespace ChessBoardModel
             }
         }
 
-        public bool IsCellTakeable(Cell currentCell, int moveRow, int moveColumn)
+        public bool IsCellTakeable(Cell currentCell, int moveRow, int moveColumn, bool isPlayerTurn)
         {
             bool IsRowSafe = false;
             bool IsColumnSafe = false;
@@ -342,7 +352,7 @@ namespace ChessBoardModel
                     if (TheGrid[currentCell.RowNumber + moveRow, currentCell.ColumnNumber + moveColumn].IsCurrentlyOccupied)
                     {
                         if (!TheGrid[currentCell.RowNumber + moveRow, currentCell.ColumnNumber + moveColumn]
-                            .CurrentPiece.IsPlayerControlled)
+                            .CurrentPiece.IsPlayerControlled == isPlayerTurn)
                         {
                             return true;
                         }
@@ -366,9 +376,16 @@ namespace ChessBoardModel
                 TheGrid[currentCell.RowNumber + moveRow, currentCell.ColumnNumber + moveColumn].IsLegalNextMove = true;
             }
         }
-         public void TryTakePawn(Cell currentCell, int moveRow, int moveColumn)
+        public void TryMove(Cell currentCell, int moveRow, int moveColumn, bool isPlayerControlled)
         {
-            if (IsCellValidPawn(currentCell, moveRow, moveColumn))
+            if (IsCellValid(currentCell, moveRow, moveColumn, isPlayerControlled))
+            {
+                TheGrid[currentCell.RowNumber + moveRow, currentCell.ColumnNumber + moveColumn].IsLegalNextMove = true;
+            }
+        }
+        public void TryTakePawn(Cell currentCell, int moveRow, int moveColumn, bool isFriendlyControlled)
+        {
+            if (IsCellValidPawn(currentCell, moveRow, moveColumn, isFriendlyControlled))
             {
                 TheGrid[currentCell.RowNumber + moveRow, currentCell.ColumnNumber + moveColumn].IsLegalNextMove = true;
             }
@@ -377,7 +394,7 @@ namespace ChessBoardModel
         {
             TheGrid[currentCell.RowNumber + moveRow, currentCell.ColumnNumber + moveColumn].IsLegalNextMove = true;
         }
-        public bool IsCellValidPawn(Cell currentCell, int moveRow, int moveColumn)
+        public bool IsCellValidPawn(Cell currentCell, int moveRow, int moveColumn, bool isPlayerControlled)
         {
             bool IsRowSafe = false;
             bool IsColumnSafe = false;
@@ -393,12 +410,45 @@ namespace ChessBoardModel
             {
                 if (TheGrid[currentCell.RowNumber + moveRow, currentCell.ColumnNumber + moveColumn].CurrentPiece != null)
                 {
-                    if (TheGrid[currentCell.RowNumber + moveRow, currentCell.ColumnNumber + moveColumn].IsCurrentlyOccupied)
+                    if (TheGrid[currentCell.RowNumber + moveRow, currentCell.ColumnNumber + moveColumn].CurrentPiece
+                        .IsPlayerControlled != isPlayerControlled)
                     {
-                        return true;
+                        if (TheGrid[currentCell.RowNumber + moveRow, currentCell.ColumnNumber + moveColumn].IsCurrentlyOccupied)
+                        {
+                            return true;
+                        }
                     }
                 }
                 return false;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public bool IsCellValid(Cell currentCell, int moveRow, int moveColumn, bool isPlayerControlled)
+        {
+            bool IsRowSafe = false;
+            bool IsColumnSafe = false;
+            if (currentCell.RowNumber + moveRow < Size && currentCell.RowNumber + moveRow >= 0)
+            {
+                IsRowSafe = true;
+            }
+            if (currentCell.ColumnNumber + moveColumn < Size && currentCell.ColumnNumber + moveColumn >= 0)
+            {
+                IsColumnSafe = true;
+            }
+
+            if (IsColumnSafe && IsRowSafe)
+            {
+                if (TheGrid[currentCell.RowNumber + moveRow, currentCell.ColumnNumber + moveColumn].CurrentPiece != null)
+                {
+                    if (TheGrid[currentCell.RowNumber + moveRow, currentCell.ColumnNumber + moveColumn].CurrentPiece.IsPlayerControlled == isPlayerControlled)
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
             else
             {

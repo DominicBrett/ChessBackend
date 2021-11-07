@@ -55,9 +55,9 @@ namespace ChessBoardModel
             {
                 if (currentCell.CurrentPiece != null)
                 {
-                    if (currentCell.CurrentPiece.IsPlayerControlled)
+                    if (currentCell.CurrentPiece.IsPlayerControlled == IsPlayerTurn)
                     {
-                        TheBoard.MarkNextLegalMoves(currentCell, piece);
+                        TheBoard.MarkNextLegalMoves(currentCell, piece, IsPlayerTurn);
                         IsPieceSelected = true;
                         SelectedCell = currentCell;
                     }
@@ -87,7 +87,7 @@ namespace ChessBoardModel
                 {
                     if (!currentCell.CurrentPiece.IsPlayerControlled)
                     {
-                        TheBoard.MarkNextLegalMoves(currentCell, piece);
+                        TheBoard.MarkNextLegalMoves(currentCell, piece, IsPlayerTurn);
                         IsPieceSelected = true;
                         SelectedCell = currentCell;
                     }
